@@ -3,7 +3,7 @@
 #include "common.h"
 #include "mysql_pool.h"
 
-using std::map;
+using std::pair;
 using std::string;
 using std::vector;
 
@@ -20,7 +20,7 @@ public:
 
     ~MysqlClient();
     // sql语句的执行函数
-    std::map<const std::string, std::vector<const char *>> command(const string &cmd);
+    vector<pair<string, vector<const char *>>> command(const string &cmd);
 
 private:
     string m_hostip;

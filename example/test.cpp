@@ -8,9 +8,9 @@ int main()
   {
     std::cout << it->first << std::endl;
     const std::string field = it->first;
-    for (size_t i = 0; i < m[field].size(); i++)
+    for (size_t i = 0; i < it->second.size(); i++)
     {
-      std::cout << m[field][i] << std::endl;
+      std::cout << it->second[i] << std::endl;
     }
   }
 
@@ -19,9 +19,9 @@ int main()
   {
     std::cout << it->first << std::endl;
     const std::string field = it->first;
-    for (size_t i = 0; i < m[field].size(); i++)
+    for (size_t i = 0; i < it->second.size(); i++)
     {
-      std::cout << m[field][i] << std::endl;
+      std::cout << it->second[i] << std::endl;
     }
   }
   return 0;

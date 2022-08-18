@@ -30,11 +30,12 @@ MysqlClient::~MysqlClient()
  * 返回对象用map主要考虑，用户可以通过数据库字段，直接获得查询的字。
  * 例如：m["字段"][index]。
  */
-std::map<const std::string, std::vector<const char *>>
+vector<pair<string, vector<const char *>>>
 MysqlClient::command(const string &sql)
 {
     auto conn = m_mysqlPool->getConnection();
-    std::map<const std::string, std::vector<const char *>> results;
+
+    vector<pair<string, vector<const char *>>> results;
     if (conn->m_conn)
     {
         if (mysql_query(conn->m_conn, sql.c_str()) == 0)
@@ -45,14 +46,14 @@ MysqlClient::command(const string &sql)
                 MYSQL_FIELD *field;
                 while ((field = mysql_fetch_field(res)))
                 {
-                    results.insert(make_pair(field->name, std::vector<const char *>()));
+                    // std::cout << "field:" << field->name << std::endl;
+                    results.push_back(make_pair(field->name, std::vector<const char *>()));
                 }
                 MYSQL_ROW row;
                 while ((row = mysql_fetch_row(res)))
                 {
                     unsigned int i = 0;
-                    for (std::map<const std::string, std::vector<const char *>>::iterator it = results.begin();
-                         it != results.end(); ++it)
+                    for (auto it = results.begin(); it != results.end(); it++)
                     {
                         (it->second).push_back(row[i++]);
                     }
