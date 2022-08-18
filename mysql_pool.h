@@ -14,73 +14,77 @@
 #include "mysql_synch.h"
 
 using std::string;
-
-class MysqlPool;
-
-class MysqlConnection
+namespace cppmysql
 {
-public:
-    using ptr = std::shared_ptr<MysqlConnection>;
 
-    MysqlConnection(MysqlPool *MysqlPool, int64_t timeout = 0);
+    class MysqlPool;
 
-    ~MysqlConnection();
+    class MysqlConnection
+    {
+    public:
+        using ptr = std::shared_ptr<MysqlConnection>;
 
-    bool connect();
+        MysqlConnection(MysqlPool *MysqlPool, int64_t timeout = 0);
 
-    void updateActiveTime();
+        ~MysqlConnection();
 
-    bool isExpire();
+        bool connect();
 
-public:
-    MYSQL *m_conn;
+        void updateActiveTime();
 
-private:
-    std::chrono::steady_clock::time_point m_lastActiveTime;
+        bool isExpire();
 
-    MysqlPool *m_mysqlPool;
+    public:
+        MYSQL *m_conn;
 
-    int64_t m_timeout; // 默认该连接失效时间，为0时不失效
-};
+    private:
+        std::chrono::steady_clock::time_point m_lastActiveTime;
 
-class MysqlPool
-{
-public:
-    MysqlPool(const string &ip,
-              const string &user,
-              const string &passwd,
-              const string &dbName,
-              int port,
-              int minConn,
-              int maxConn);
+        MysqlPool *m_mysqlPool;
 
-    ~MysqlPool();
+        int64_t m_timeout; // 默认该连接失效时间，为0时不失效
+    };
 
-    int init();
+    class MysqlPool
+    {
+    public:
+        MysqlPool(const string &ip,
+                  const string &user,
+                  const string &passwd,
+                  const string &dbName,
+                  int port,
+                  int minConn,
+                  int maxConn);
 
-    void serverCron();
+        ~MysqlPool();
 
-    MysqlConnection::ptr getConnection();
+        int init();
 
-    void freeConnection(MysqlConnection::ptr conn);
+        void serverCron();
 
-public:
-    string m_hostip; // 主机ip
-    string m_user;   // mysql用户名
-    string m_passwd; // mysql密码
-    string m_dbName; // 要使用的mysql数据库名字
-    int m_hostport;  // mysql端口
+        MysqlConnection::ptr getConnection();
 
-private:
-    int m_minConn; // 连接池允许最小连接数
-    int m_maxConn; // 连接池允许最大连接数
-    int m_curConn; // 连接池当前连接数
+        void freeConnection(MysqlConnection::ptr conn);
 
-    mutable MutexLock m_mutex;
-    Condition m_notEmpty;
+    public:
+        string m_hostip; // 主机ip
+        string m_user;   // mysql用户名
+        string m_passwd; // mysql密码
+        string m_dbName; // 要使用的mysql数据库名字
+        int m_hostport;  // mysql端口
 
-    std::list<MysqlConnection::ptr> m_connQueue;
-    std::thread *m_cronThread; //用于定时检测连接情况的线程
-    bool m_quit;
-};
+    private:
+        int m_minConn; // 连接池允许最小连接数
+        int m_maxConn; // 连接池允许最大连接数
+        int m_curConn; // 连接池当前连接数
+
+        mutable MutexLock m_mutex;
+        Condition m_notEmpty;
+
+        std::list<MysqlConnection::ptr> m_connQueue;
+        std::thread *m_cronThread; //用于定时检测连接情况的线程
+        bool m_quit;
+    };
+
+} // namespace cppmysql
 #endif // Mysql_POOL_H

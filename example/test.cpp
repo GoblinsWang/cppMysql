@@ -1,4 +1,5 @@
 #include "mysql_client.h"
+using namespace cppmysql;
 
 int main()
 {

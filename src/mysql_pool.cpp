@@ -1,4 +1,5 @@
 #include "mysql_pool.h"
+using namespace cppmysql;
 
 MysqlConnection::MysqlConnection(MysqlPool *mysqlPool, int64_t timeout)
     : m_conn(nullptr),
