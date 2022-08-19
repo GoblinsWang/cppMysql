@@ -50,7 +50,7 @@ MysqlClient::command(const string &sql)
                 while ((field = mysql_fetch_field(res)))
                 {
                     // std::cout << "field:" << field->name << std::endl;
-                    results.push_back(make_pair(field->name, ""));
+                    results.push_back(std::make_pair(field->name, ""));
                 }
                 MYSQL_ROW row;
                 while ((row = mysql_fetch_row(res)))
