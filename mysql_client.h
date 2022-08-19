@@ -21,7 +21,7 @@ namespace cppmysql
 
         ~MysqlClient();
         // sql语句的执行函数
-        vector<pair<string, vector<const char *>>> command(const string &cmd);
+        vector<pair<string, string>> command(const string &cmd);
 
     private:
         string m_hostip;
@@ -33,4 +33,5 @@ namespace cppmysql
     };
 
 } // namespace cppmysql
+
 #endif // MYSQLCLIENT_H

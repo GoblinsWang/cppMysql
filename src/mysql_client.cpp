@@ -1,4 +1,4 @@
-#include "mysql_client.h"
+#include "../mysql_client.h"
 using namespace cppmysql;
 
 MysqlClient::MysqlClient(const string &ip,
@@ -13,6 +13,8 @@ MysqlClient::MysqlClient(const string &ip,
     m_hostport = port;
     m_mysqlPool = new MysqlPool(ip, user, passwd, dbName, port, minConn, maxConn);
     m_mysqlPool->init();
+    std::cout << "mysql pool init success!" << std::endl;
+    // LogDebug("mysql pool init success!");
 }
 
 MysqlClient::~MysqlClient()
@@ -31,12 +33,12 @@ MysqlClient::~MysqlClient()
  * 返回对象用map主要考虑，用户可以通过数据库字段，直接获得查询的字。
  * 例如：m["字段"][index]。
  */
-vector<pair<string, vector<const char *>>>
+vector<pair<string, string>>
 MysqlClient::command(const string &sql)
 {
     auto conn = m_mysqlPool->getConnection();
 
-    vector<pair<string, vector<const char *>>> results;
+    vector<pair<string, string>> results;
     if (conn->m_conn)
     {
         if (mysql_query(conn->m_conn, sql.c_str()) == 0)
@@ -48,7 +50,7 @@ MysqlClient::command(const string &sql)
                 while ((field = mysql_fetch_field(res)))
                 {
                     // std::cout << "field:" << field->name << std::endl;
-                    results.push_back(make_pair(field->name, std::vector<const char *>()));
+                    results.push_back(make_pair(field->name, ""));
                 }
                 MYSQL_ROW row;
                 while ((row = mysql_fetch_row(res)))
@@ -56,7 +58,8 @@ MysqlClient::command(const string &sql)
                     unsigned int i = 0;
                     for (auto it = results.begin(); it != results.end(); it++)
                     {
-                        (it->second).push_back(row[i++]);
+                        it->second = row[i++];
+                        //(it->second).push_back(row[i++]);
                     }
                 }
                 mysql_free_result(res);
